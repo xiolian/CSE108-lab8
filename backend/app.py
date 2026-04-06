@@ -1,9 +1,14 @@
 from flask import Flask, request
 from flask_cors import CORS
 from dbSetup import db, Course, User, Enrollment
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
+app.secret_key = "secretkeything"
 CORS(app)
+
+admin = Admin(app, name="Admin")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///enrollment.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -12,6 +17,28 @@ print("APP DB URI:", app.config["SQLALCHEMY_DATABASE_URI"])
 print("APP instance path:", app.instance_path)
 
 db.init_app(app)
+
+class UserAdmin(ModelView):
+    column_list = ["id", "name", "username", "password", "role", "email"]
+    form_columns = ["name", "username", "password", "role", "email"]
+
+
+class CourseAdmin(ModelView):
+    column_list = ["id", "course_name", "schedule", "capacity", "teacher"]
+    form_columns = ["course_name", "schedule", "capacity", "teacher"]
+
+
+class EnrollmentAdmin(ModelView):
+    column_list = ["id", "student", "course", "grade"]
+    form_columns = ["student", "course", "grade"]
+
+class SecureModelView(ModelView):
+    def is_accessible(self):
+        return True
+
+admin.add_view(UserAdmin(User, db.session))
+admin.add_view(CourseAdmin(Course, db.session))
+admin.add_view(EnrollmentAdmin(Enrollment, db.session))
 
 with app.app_context():
     db.create_all()

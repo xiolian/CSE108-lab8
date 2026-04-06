@@ -286,6 +286,20 @@ function App() {
         </>
       )}
 
+      {user.role === "admin" && ( // Admin view
+        <>
+          <h2>Admin Dashboard</h2>
+
+          <iframe
+            src="http://127.0.0.1:5000/admin"
+            title="Admin Panel"
+            width="100%"
+            height="600px"
+            style={{ border: "none" }}
+          />
+        </>
+      )}
+
     </div>
   )
 }
