@@ -144,6 +144,7 @@ button:disabled {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   overflow: hidden;
   border-radius: 14px;
 }
@@ -165,6 +166,18 @@ td {
   border-bottom: 1px solid #243244;
   color: #e2e8f0;
   background: rgba(15, 23, 42, 0.72);
+}
+
+.col-name {
+  text-align: left;
+}
+
+.col-schedule {
+  text-align: left;
+}
+
+.col-center {
+  text-align: center;
 }
 
 tbody tr:hover td {

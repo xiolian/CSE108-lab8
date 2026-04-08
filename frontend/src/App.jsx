@@ -287,19 +287,19 @@ function App() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Course Name</th>
-                      <th>Schedule</th>
-                      <th>Grade</th>
-                      <th>Action</th>
+                      <th className="col-name">Course Name</th>
+                      <th className="col-schedule">Schedule</th>
+                      <th className="col-center">Grade</th>
+                      <th className="col-center">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {studentCourses.map((course) => (
                       <tr key={course.course_id}>
-                        <td>{course.course_name}</td>
-                        <td>{course.schedule}</td>
-                        <td>{course.grade}</td>
-                        <td>
+                        <td className="col-name">{course.course_name}</td>
+                        <td className="col-schedule">{course.schedule}</td>
+                        <td className="col-center">{course.grade}</td>
+                        <td className="col-center">
                           <button 
                             className="danger-btn" 
                             onClick={() => handleDrop(course.course_id)}
@@ -320,21 +320,21 @@ function App() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Course Name</th>
-                      <th>Schedule</th>
-                      <th>Enrolled</th>
-                      <th>Action</th>
+                      <th className="col-name">Course Name</th>
+                      <th className="col-schedule">Schedule</th>
+                      <th className="col-center">Enrolled</th>
+                      <th className="col-center">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {courses.map((course) => (
                       <tr key={course.id}>
-                        <td>{course.course_name}</td>
-                        <td>{course.schedule}</td>
-                        <td>
+                        <td className="col-name">{course.course_name}</td>
+                        <td className="col-schedule">{course.schedule}</td>
+                        <td className="col-center">
                           {course.enrolled_count} / {course.capacity}
                         </td>
-                        <td>
+                        <td className="col-center">
                           {isAlreadyEnrolled(course.id) ? (
                             <button
                               className="danger-btn"
