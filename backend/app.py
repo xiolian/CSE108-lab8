@@ -82,6 +82,34 @@ def get_student_courses(student_id):
 
     return result
 
+@app.route("/api/student/<int:student_id>/drop/<int:course_id>", methods=["DELETE"])
+def drop_student(student_id, course_id):
+    student = User.query.get(student_id)
+    course = Course.query.get(course_id)
+
+    if not student:
+        return {"error": "Student not found"}, 404
+
+    if not course:
+        return {"error": "Course not found"}, 404
+
+    enrollment = Enrollment.query.filter_by(
+        student_id=student_id,
+        course_id=course_id
+    ).first()
+
+    if not enrollment:
+        return {"error": "Student is not enrolled in this course"}, 400
+
+    db.session.delete(enrollment)
+    db.session.commit()
+
+    return {
+        "message": "Course dropped successfully",
+        "student": student.name,
+        "course": course.course_name
+    }
+
 @app.route("/api/student/<int:student_id>/enroll/<int:course_id>", methods=["POST"])
 def enroll_student(student_id, course_id):
     student = User.query.get(student_id)

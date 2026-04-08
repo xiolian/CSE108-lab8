@@ -123,6 +123,23 @@ function App() {
       .catch(error => console.error("Error:", error))
   }
 
+  const handleDrop = (courseId) => {
+    fetch(`http://127.0.0.1:5000/api/student/${user.id}/drop/${courseId}`, {
+      method: "DELETE"
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          setMessage(data.message)
+          loadCourses()
+          loadStudentCourses()
+        } else if (data.error) {
+          setMessage(data.error)
+        }
+      })
+      .catch(error => console.error("Error:", error))
+  }
+
     if (!user) {
     return (
       <div className="page-shell">
@@ -273,6 +290,7 @@ function App() {
                       <th>Course Name</th>
                       <th>Schedule</th>
                       <th>Grade</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -281,6 +299,14 @@ function App() {
                         <td>{course.course_name}</td>
                         <td>{course.schedule}</td>
                         <td>{course.grade}</td>
+                        <td>
+                          <button 
+                            className="danger-btn" 
+                            onClick={() => handleDrop(course.course_id)}
+                          >
+                            Drop
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -309,20 +335,22 @@ function App() {
                           {course.enrolled_count} / {course.capacity}
                         </td>
                         <td>
-                          <button
-                            className="primary-btn"
-                            onClick={() => handleEnroll(course.id)}
-                            disabled={
-                              course.enrolled_count >= course.capacity ||
-                              isAlreadyEnrolled(course.id)
-                            }
-                          >
-                            {isAlreadyEnrolled(course.id)
-                              ? "Enrolled"
-                              : course.enrolled_count >= course.capacity
-                              ? "Full"
-                              : "Enroll"}
+                          {isAlreadyEnrolled(course.id) ? (
+                            <button
+                              className="danger-btn"
+                              onClick={() => handleDrop(course.id)}
+                            >
+                              Drop
+                            </button>
+                          ) : (
+                            <button
+                              className="primary-btn"
+                              onClick={() => handleEnroll(course.id)}
+                              disabled={course.enrolled_count >= course.capacity}
+                            >
+                              {course.enrolled_count >= course.capacity ? "Full" : "Add"}
                           </button>
+                        )}
                         </td>
                       </tr>
                     ))}
