@@ -22,3 +22,8 @@
     Example
     - teacher: usrnme - jake123 | password - 1234
     - student: usrnme - jilxio | password - 1234
+
+## Or just use Docker
+1. Install docker and make sure you have "docker compose" installed
+2. Run `./start.sh` or `docker compose up`
+3. Open `http://localhost:5173`
