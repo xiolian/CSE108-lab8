@@ -3,6 +3,7 @@ from flask_cors import CORS
 from dbSetup import db, Course, User, Enrollment
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from sqlalchemy.pool import NullPool
 from flask_admin.form.fields import Select2Field
 from flask_admin.form.validators import FieldListInputRequired
 from flask_admin.contrib.sqla.fields import QuerySelectField, QuerySelectMultipleField
@@ -51,6 +52,9 @@ admin = Admin(app, name="Admin")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///enrollment.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "poolclass": NullPool
+}
 
 print("APP DB URI:", app.config["SQLALCHEMY_DATABASE_URI"])
 print("APP instance path:", app.instance_path)
