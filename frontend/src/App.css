@@ -180,10 +180,6 @@ td {
   text-align: center;
 }
 
-tbody tr:hover td {
-  background: rgba(30, 41, 59, 0.95);
-}
-
 iframe {
   background: white;
 }
