@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import "./App.css"
 
 function App() {
   const [courses, setCourses] = useState([])
@@ -122,184 +123,229 @@ function App() {
       .catch(error => console.error("Error:", error))
   }
 
-  if (!user){ // Login
+    if (!user) {
     return (
-      <div>
-        <h1>Login</h1>
+      <div className="page-shell">
+        <div className="login-card">
+          <h1>Enrollment Web App</h1>
+          <p className="subtitle">Sign in to continue</p>
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Enter username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
 
-        <br /><br />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <button className="primary-btn login-btn" onClick={handleLogin}>
+            Login
+          </button>
 
-        <br /><br />
-
-        <button onClick={handleLogin}>Login</button>
-        <p>{message}</p>
+          {message && <p className="message-box">{message}</p>}
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
-      <h1>Enrollment Web App</h1>
-      <p>Frontend running</p>
+    <div className="page-shell">
+      <div className="app-container">
+        <div className="topbar">
+          <div>
+            <h1>Enrollment Web App</h1>
+            <p className="subtitle">
+              {user.role === "student" && "Student Dashboard"}
+              {user.role === "teacher" && "Teacher Dashboard"}
+              {user.role === "admin" && "Admin Dashboard"}
+            </p>
+          </div>
 
-      <button onClick={() => {
-        setUser(null)
-        setMessage("")
-      }}>
-        Logout
-      </button>
+          <button
+            className="danger-btn"
+            onClick={() => {
+              setUser(null)
+              setMessage("")
+            }}
+          >
+            Logout
+          </button>
+        </div>
 
-      <div>
-        {user.role === "student" && <p>Student Dashboard</p>}
-        {user.role === "teacher" && <p>Teacher Dashboard</p>}
+        {message && <p className="message-box">{message}</p>}
+
+        {roleView === "teacher" && (
+          <>
+            <section className="card">
+              <h2>Teacher Courses</h2>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Course Name</th>
+                      <th>Schedule</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teacherCourses.map((course) => (
+                      <tr key={course.id}>
+                        <td>{course.course_name}</td>
+                        <td>{course.schedule}</td>
+                        <td>
+                          <button
+                            className="primary-btn"
+                            onClick={() => loadCourseStudents(course.id)}
+                          >
+                            View Students
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="card">
+              <h2>Students in Selected Course</h2>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Grade</th>
+                      <th>New Grade</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courseStudents.map((student) => (
+                      <tr key={student.student_id}>
+                        <td>{student.student_name}</td>
+                        <td>{student.grade}</td>
+                        <td>
+                          <input
+                            type="number"
+                            placeholder="New grade"
+                            id={`grade-${student.student_id}`}
+                          />
+                        </td>
+                        <td>
+                          <button
+                            className="primary-btn"
+                            onClick={() =>
+                              updateGrade(student.enrollment_id, student.student_id)
+                            }
+                          >
+                            Update Grade
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
+
+        {roleView === "student" && (
+          <>
+            <section className="card">
+              <h2>My Courses</h2>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Course Name</th>
+                      <th>Schedule</th>
+                      <th>Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {studentCourses.map((course) => (
+                      <tr key={course.course_id}>
+                        <td>{course.course_name}</td>
+                        <td>{course.schedule}</td>
+                        <td>{course.grade}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="card">
+              <h2>All Courses</h2>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Course Name</th>
+                      <th>Schedule</th>
+                      <th>Enrolled</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courses.map((course) => (
+                      <tr key={course.id}>
+                        <td>{course.course_name}</td>
+                        <td>{course.schedule}</td>
+                        <td>
+                          {course.enrolled_count} / {course.capacity}
+                        </td>
+                        <td>
+                          <button
+                            className="primary-btn"
+                            onClick={() => handleEnroll(course.id)}
+                            disabled={
+                              course.enrolled_count >= course.capacity ||
+                              isAlreadyEnrolled(course.id)
+                            }
+                          >
+                            {isAlreadyEnrolled(course.id)
+                              ? "Enrolled"
+                              : course.enrolled_count >= course.capacity
+                              ? "Full"
+                              : "Enroll"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
+
+        {user.role === "admin" && (
+          <section className="card">
+            <h2>Admin Dashboard</h2>
+            <iframe
+              src="http://127.0.0.1:5000/admin"
+              title="Admin Panel"
+              width="100%"
+              height="600px"
+              style={{ border: "none", borderRadius: "12px" }}
+            />
+          </section>
+        )}
       </div>
-
-      <p>{message}</p>
-
-      {roleView === "teacher" && ( // Teacher View Page
-        <>
-          <h2>Teacher Courses</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Course Name</th>
-                <th>Schedule</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teacherCourses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.course_name}</td>
-                  <td>{course.schedule}</td>
-                  <td>
-                    <button onClick={() => loadCourseStudents(course.id)}>
-                      View Students
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <h3>Students in Selected Course</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Student Name</th>
-                <th>Grade</th>
-                <th>New Grade</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courseStudents.map((student) => (
-                <tr key={student.student_id}>
-                  <td>{student.student_name}</td>
-                  <td>{student.grade}</td>
-                  <td>
-                    <input
-                      type="number"
-                      placeholder="New grade"
-                      id={`grade-${student.student_id}`}
-                    />
-                  </td>
-                  <td>
-                    <button onClick={() => updateGrade(student.enrollment_id, student.student_id)}>
-                      Update Grade
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-
-      {roleView === "student" && ( // Student View Page
-        <>
-          <h2>My Courses</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Course Name</th>
-                <th>Schedule</th>
-                <th>Grade</th>
-              </tr>
-            </thead>
-            <tbody>
-              {studentCourses.map((course) => (
-                <tr key={course.course_id}>
-                  <td>{course.course_name}</td>
-                  <td>{course.schedule}</td>
-                  <td>{course.grade}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          
-
-          <h2>All Courses</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Course Name</th>
-                <th>Schedule</th>
-                <th>Enrolled</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.course_name}</td>
-                  <td>{course.schedule}</td>
-                  <td>{course.enrolled_count} / {course.capacity}</td>
-                  <td>
-                    <button onClick={() => handleEnroll(course.id)}
-                      disabled={course.enrolled_count >= course.capacity || isAlreadyEnrolled(course.id)}>
-                        {isAlreadyEnrolled(course.id)
-                        ? "Enrolled"
-                        : course.enrolled_count >= course.capacity
-                        ? "Full"
-                        : "Enroll"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-
-      {user.role === "admin" && ( // Admin view
-        <>
-          <h2>Admin Dashboard</h2>
-
-          <iframe
-            src="http://127.0.0.1:5000/admin"
-            title="Admin Panel"
-            width="100%"
-            height="600px"
-            style={{ border: "none" }}
-          />
-        </>
-      )}
-
     </div>
   )
 }
