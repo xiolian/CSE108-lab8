@@ -3,6 +3,45 @@ from flask_cors import CORS
 from dbSetup import db, Course, User, Enrollment
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.form.fields import Select2Field
+from flask_admin.form.validators import FieldListInputRequired
+from flask_admin.contrib.sqla.fields import QuerySelectField, QuerySelectMultipleField
+from flask_admin.contrib.sqla.validators import Unique
+
+
+def patch_flask_admin_for_wtforms3():
+    FieldListInputRequired.field_flags = {"required": True}
+    Unique.field_flags = {"unique": True}
+
+    def iter_select2_choices(self):
+        if self.allow_blank:
+            yield ("__None", self.blank_text, self.data is None, {})
+
+        for choice in self.choices:
+            if isinstance(choice, tuple):
+                yield (choice[0], choice[1], self.coerce(choice[0]) == self.data, {})
+            else:
+                yield (choice.value, choice.name, self.coerce(choice.value) == self.data, {})
+
+    def iter_query_choices(self):
+        if self.allow_blank:
+            yield ("__None", self.blank_text, self.data is None, {})
+
+        for pk, obj in self._get_object_list():
+            yield (pk, self.get_label(obj), obj == self.data, {})
+
+    def iter_query_multiple_choices(self):
+        selected = self.data or []
+
+        for pk, obj in self._get_object_list():
+            yield (pk, self.get_label(obj), obj in selected, {})
+
+    Select2Field.iter_choices = iter_select2_choices
+    QuerySelectField.iter_choices = iter_query_choices
+    QuerySelectMultipleField.iter_choices = iter_query_multiple_choices
+
+
+patch_flask_admin_for_wtforms3()
 
 app = Flask(__name__)
 app.secret_key = "secretkeything"
